@@ -1,0 +1,99 @@
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6; /* Light gray background */
+    color: #1f2937; /* Default text color: gray-800 */
+  }
+  .modal {
+    display: none; /* Hidden by default */
+    align-items: center; /* Vertically center content */
+    justify-content: center; /* Horizontally center content */
+  }
+  .modal.open {
+    display: flex; /* Show when open */
+  }
+  /* Custom scrollbar for better aesthetics */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #e5e7eb; /* gray-200 */
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #9ca3af; /* gray-400 */
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280; /* gray-500 */
+  }
+
+  /* Status Badges */
+  .status-badge {
+    padding: 0.25rem 0.75rem; /* py-1 px-3 */
+    border-radius: 9999px; /* rounded-full */
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 600; /* semibold */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block; /* Ensures padding and background apply correctly */
+    line-height: 1.2; /* Adjust for better vertical alignment within badge */
+  }
+  .status-pending { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; /* amber-100, amber-700, amber-200 border */ }
+  .status-confirmed { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; /* blue-100, blue-700, blue-200 border */ }
+  .status-delivering { background-color: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4; /* teal-100, teal-700, teal-200 border */ }
+  .status-delivered { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; /* green-100, green-700, green-200 border */ }
+  .status-cancelled { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; /* red-100, red-700, red-200 border */ }
+
+  /* Loader Animation */
+  .loader {
+    border: 5px solid #e5e7eb; /* gray-200 */
+    border-top: 5px solid #3b82f6; /* blue-500 */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Tab Button Styling */
+  .tab-button {
+    padding: 0.625rem 1.25rem; /* py-2.5 px-5 */
+    margin-right: 0.5rem; /* mr-2 */
+    border-radius: 0.5rem; /* rounded-lg */
+    font-weight: 500; /* medium */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid transparent;
+  }
+  .tab-button.active {
+    background-color: #3b82f6; /* blue-500 */
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+  }
+  .tab-button:not(.active) {
+    background-color: #e5e7eb; /* gray-200 */
+    color: #374151; /* gray-700 */
+    border: 1px solid #d1d5db; /* gray-300 */
+  }
+  .tab-button:not(.active):hover {
+    background-color: #d1d5db; /* gray-300 */
+    color: #1f2937; /* gray-800 */
+  }
+  .hidden-section {
+    display: none;
+  }
+
+  /* Input focus styles for better accessibility and appearance */
+  input[type="text"]:focus,
+  input[type="tel"]:focus,
+  input[type="number"]:focus,
+  textarea:focus,
+  select:focus {
+    border-color: #2563eb; /* focus:border-blue-600 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* focus:ring-blue-500 with opacity */
+    outline: none;
+  }
