@@ -18,7 +18,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import {
     getFirestore, collection, onSnapshot, doc, setDoc, addDoc,
-    updateDoc, deleteDoc, query, orderBy, where, serverTimestamp, writeBatch, getDocs
+    updateDoc, deleteDoc, query, where, serverTimestamp, writeBatch, getDocs
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
 // Initialize Firebase
@@ -26,19 +26,21 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Global array to hold all orders fetched from Firestore
-let allOrders = [];
-
-// Mock Data for Synchronization - Added customerPhone
+// Mock Data for Synchronization
 const mockOrders = [
-    { customerName: "Alice Smith", customerPhone: "1112223333", deliveryAddress: "123 Main St, Anytown", product: "20L Tin", quantity: 5, status: "Pending", orderDate: new Date('2025-05-10T10:00:00Z'), isPaid: false, amount: 250 },
-    { customerName: "Bob Johnson", customerPhone: "4445556666", deliveryAddress: "456 Oak Ave, Somewhere", product: "1L Bottle (Case)", quantity: 10, status: "Delivered", orderDate: new Date('2025-05-12T14:30:00Z'), isPaid: true, amount: 1200 },
-    { customerName: "Charlie Brown", customerPhone: "7778889999", deliveryAddress: "789 Pine Rd, Peanuts", product: "500ml Bottle (Case)", quantity: 3, status: "Pending", orderDate: new Date('2025-05-15T09:15:00Z'), isPaid: false, amount: 540 },
-    { customerName: "Diana Prince", customerPhone: "0001112222", deliveryAddress: "101 Lasso Ln, Themyscira", product: "Tanker Supply", quantity: 1, status: "Delivered", orderDate: new Date('2025-05-18T11:00:00Z'), isPaid: true, amount: 2500 },
-    { customerName: "Clark Kent", customerPhone: "3334445555", deliveryAddress: "202 Fortress, Metropolis", product: "20L Tin", quantity: 2, status: "Cancelled", orderDate: new Date('2025-05-20T16:00:00Z'), isPaid: false, amount: 100 },
-    { customerName: "Bruce Wayne", customerPhone: "6667778888", deliveryAddress: "303 Batcave, Gotham", product: "1L Bottle (Case)", quantity: 8, status: "Pending", orderDate: new Date('2025-05-22T08:00:00Z'), isPaid: false, amount: 960 },
-    { customerName: "Selina Kyle", customerPhone: "9990001111", deliveryAddress: "404 Alley, Gotham", product: "500ml Bottle (Case)", quantity: 4, status: "Delivered", orderDate: new Date('2025-05-25T13:00:00Z'), isPaid: true, amount: 720 }
+    { customerName: "Alice Smith", customerPhone: "9876543210", deliveryAddress: "123 Main St, Anytown", product: "20L Tin", quantity: 5, status: "Pending", orderDate: new Date('2025-05-10T10:00:00Z'), isPaid: false, amount: 250 },
+    { customerName: "Bob Johnson", customerPhone: "9123456789", deliveryAddress: "456 Oak Ave, Somewhere", product: "1L Bottle (Case)", quantity: 10, status: "Delivered", orderDate: new Date('2025-05-12T14:30:00Z'), isPaid: true, amount: 1200 },
+    { customerName: "Charlie Brown", customerPhone: "9988776655", deliveryAddress: "789 Pine Rd, Peanuts", product: "500ml Bottle (Case)", quantity: 3, status: "Pending", orderDate: new Date('2025-05-15T09:15:00Z'), isPaid: false, amount: 540 },
+    { customerName: "Diana Prince", customerPhone: "9000011111", deliveryAddress: "101 Lasso Ln, Themyscira", product: "Tanker Supply", quantity: 1, status: "Delivered", orderDate: new Date('2025-05-18T11:00:00Z'), isPaid: true, amount: 2500 },
+    { customerName: "Clark Kent", customerPhone: "9222233333", deliveryAddress: "202 Fortress, Metropolis", product: "20L Tin", quantity: 2, status: "Cancelled", orderDate: new Date('2025-05-20T16:00:00Z'), isPaid: false, amount: 100 },
+    { customerName: "Bruce Wayne", customerPhone: "9444455555", deliveryAddress: "303 Batcave, Gotham", product: "1L Bottle (Case)", quantity: 8, status: "Pending", orderDate: new Date('2025-05-22T08:00:00Z'), isPaid: false, amount: 960 },
+    { customerName: "Selina Kyle", customerPhone: "9666677777", deliveryAddress: "404 Alley, Gotham", product: "500ml Bottle (Case)", quantity: 4, status: "Delivered", orderDate: new Date('2025-05-25T13:00:00Z'), isPaid: true, amount: 720 },
+    { customerName: "Alice Smith", customerPhone: "9876543210", deliveryAddress: "123 Main St, Anytown", product: "20L Tin", quantity: 2, status: "Pending", orderDate: new Date('2025-05-28T10:00:00Z'), isPaid: false, amount: 100 },
+    { customerName: "Bob Johnson", customerPhone: "9123456789", deliveryAddress: "456 Oak Ave, Somewhere", product: "1L Bottle (Case)", quantity: 5, status: "Pending", orderDate: new Date('2025-06-01T09:00:00Z'), isPaid: false, amount: 600 },
+    { customerName: "Charlie Brown", customerPhone: "9988776655", deliveryAddress: "789 Pine Rd, Peanuts", product: "20L Tin", quantity: 1, status: "Confirmed", orderDate: new Date('2025-06-03T11:00:00Z'), isPaid: false, amount: 50 },
+    { customerName: "Alice Smith", customerPhone: "9876543210", deliveryAddress: "123 Main St, Anytown", product: "Tanker Supply", quantity: 1, status: "Pending", orderDate: new Date('2025-06-04T12:00:00Z'), isPaid: false, amount: 2500 }
 ];
+
 
 // Declare DOM elements globally but initialize them inside DOMContentLoaded
 let loaderContainer;
@@ -50,14 +52,14 @@ let closeModalBtn;
 let orderForm;
 let modalTitle;
 let saveOrderBtn;
-let deleteOrderBtn;
+let deleteOrderBtn; // This might not be used if delete is inline
 let customerNameInput;
 let customerPhoneInput; // Added customerPhoneInput
 let deliveryAddressInput;
 let quantityInputModal;
 let statusInput;
-let orderDateInput;
-let isPaidCheckbox;
+let orderDateInput; // This is not in the HTML, will remove if not needed
+let isPaidCheckbox; // This is not in the HTML, will remove if not needed
 let customConfirmModal;
 let confirmModalTitle;
 let confirmModalMessage;
@@ -85,13 +87,13 @@ let calculatedAmountInputModal;
 let searchOrderInput; // Added searchOrderInput
 let filterStatusSelect; // Added filterStatusSelect
 let applyFiltersBtn; // Added applyFiltersBtn
+// Removed: generateMonthlyBillBtn as it's no longer in HTML
 
 // New Email/Password Auth elements
 let emailInput;
 let passwordInput;
 let emailLoginBtn;
 let emailSignupBtn;
-
 
 // Product prices (INR) - ensure these match what's in the HTML select options if prices are displayed there
 const productPrices = {
@@ -106,6 +108,7 @@ let currentOrderId = null;
 let unsubscribeOrders = null; // To store the unsubscribe function for the Firestore listener
 let userId = null; // To store the authenticated user's ID
 let ordersCollectionRef; // Firestore collection reference, set after authentication
+let orders = []; // Global array to store all fetched orders
 
 // --- Utility Functions ---
 function showStatusMessage(message, type = 'info', duration = 3000) {
@@ -126,13 +129,19 @@ function showStatusMessage(message, type = 'info', duration = 3000) {
 }
 
 function showModal(title, isEditing = false) {
-    if (!orderModal || !modalTitle) return;
+    console.log("Calling showModal for:", title); // Debugging log
+    if (!orderModal || !modalTitle) {
+        console.error("Order modal or title element not found!"); // Debugging log
+        return;
+    }
     modalTitle.textContent = title;
     orderModal.classList.add('open');
+    console.log("Order modal 'open' class added."); // Debugging log
     // The delete button is not inside the modal form, so no need to toggle its visibility here.
 }
 
 function hideModal() {
+    console.log("Calling hideModal."); // Debugging log
     if (!orderModal || !orderForm) return;
     orderModal.classList.remove('open');
     orderForm.reset();
@@ -141,7 +150,11 @@ function hideModal() {
 }
 
 function showConfirmModal(title, message, onConfirm) {
-    if (!customConfirmModal || !confirmModalTitle || !confirmModalMessage || !confirmModalConfirmBtn) return;
+    console.log("Calling showConfirmModal for:", title); // Debugging log
+    if (!customConfirmModal || !confirmModalTitle || !confirmModalMessage || !confirmModalConfirmBtn) {
+        console.error("Confirm modal elements not found!"); // Debugging log
+        return;
+    }
     confirmModalTitle.textContent = title;
     confirmModalMessage.textContent = message;
     confirmModalConfirmBtn.onclick = () => {
@@ -149,12 +162,17 @@ function showConfirmModal(title, message, onConfirm) {
         hideConfirmModal();
     };
     customConfirmModal.classList.add('open');
+    console.log("Confirm modal 'open' class added."); // Debugging log
 }
 
 function hideConfirmModal() {
+    console.log("Calling hideConfirmModal."); // Debugging log
     if (!customConfirmModal) return;
     customConfirmModal.classList.remove('open');
 }
+
+// Removed: showDownloadShareModal and hideDownloadShareModal functions as the modal is removed.
+
 
 function calculateAndUpdateAmountModal() {
   if (!productTypeSelectModal || !quantityInputModal || !calculatedAmountInputModal) return;
@@ -295,7 +313,8 @@ async function handleSignOut() {
 }
 
 // Authentication state observer
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => { // Added async keyword
+    console.log("onAuthStateChanged triggered. User:", user ? user.uid : "null (signed out)"); // Debugging log
     if (loaderContainer) loaderContainer.classList.remove('hidden'); // Show loader immediately
 
     if (user) {
@@ -314,6 +333,7 @@ onAuthStateChanged(auth, (user) => {
 
         if (authSection) authSection.classList.add('hidden'); // Hide sign-in UI
         if (adminContent) adminContent.classList.remove('hidden'); // Show admin content
+        console.log("Auth Section hidden, Admin Content shown."); // Debugging log
 
         // If there's an existing listener, unsubscribe before setting up a new one
         if (unsubscribeOrders) {
@@ -332,6 +352,7 @@ onAuthStateChanged(auth, (user) => {
 
         if (authSection) authSection.classList.remove('hidden'); // Show sign-in UI
         if (adminContent) adminContent.classList.add('hidden'); // Hide admin content
+        console.log("Auth Section shown, Admin Content hidden."); // Debugging log
 
         // Clear orders table and unsubscribe from Firestore listener
         if (ordersTableBody) ordersTableBody.innerHTML = '<tr><td colspan="8" class="text-center p-10 text-gray-500">Please sign in to view orders.</td></tr>';
@@ -339,6 +360,26 @@ onAuthStateChanged(auth, (user) => {
         if (unsubscribeOrders) {
             unsubscribeOrders();
             unsubscribeOrders = null;
+        }
+
+        // Sign in anonymously if no user is signed in and no initial auth token is provided
+        if (typeof __initial_auth_token === 'undefined') {
+            try {
+                await signInAnonymously(auth);
+                showStatusMessage("Signed in anonymously.", "info");
+            } catch (error) {
+                console.error("Anonymous sign-in error:", error);
+                showStatusMessage(`Anonymous sign-in failed: ${error.message}`, "error");
+            }
+        } else {
+            // Sign in with custom token if provided
+            try {
+                await signInWithCustomToken(auth, __initial_auth_token);
+                showStatusMessage("Signed in with custom token.", "info");
+            } catch (error) {
+                console.error("Custom token sign-in error:", error);
+                showStatusMessage(`Custom token sign-in failed: ${error.message}`, "error");
+            }
         }
     }
     if (loaderContainer) loaderContainer.classList.add('hidden'); // Hide loader after auth state is handled
@@ -356,27 +397,30 @@ function setupFirestoreListener() {
     }
 
     if (loaderContainer) loaderContainer.classList.remove('hidden');
-    const q = query(ordersCollectionRef, orderBy('orderDate', 'desc'));
+    // Removed orderBy('orderDate', 'desc') to avoid potential index issues as per instructions
+    const q = query(ordersCollectionRef);
 
     unsubscribeOrders = onSnapshot(q, (snapshot) => {
-        const fetchedOrders = []; // Use a temporary variable for fetched orders
+        orders = []; // Clear previous orders
         snapshot.forEach(doc => {
             const data = doc.data();
-            fetchedOrders.push({
+            orders.push({
                 id: doc.id,
                 ...data,
                 // Convert Firestore Timestamp to Date object if it exists and has toDate() method
                 orderDate: data.orderDate && data.orderDate.toDate ? data.orderDate.toDate() : (data.orderDate ? new Date(data.orderDate) : null)
             });
         });
-        allOrders = fetchedOrders; // Update the global allOrders array
+        // Sort orders by date descending in memory
+        orders.sort((a, b) => (b.orderDate ? b.orderDate.getTime() : 0) - (a.orderDate ? a.orderDate.getTime() : 0));
+
         renderOrders(getFilteredOrders()); // Render filtered orders initially
         // Only render monthly dues if that tab is active
         if (monthlyDuesSection && !monthlyDuesSection.classList.contains('hidden-section')) {
-            renderMonthlyDues(allOrders); // Monthly dues always use all orders
+            renderMonthlyDues(); // Monthly dues will use the global 'orders' array
         }
         if (loaderContainer) loaderContainer.classList.add('hidden');
-        if(allOrders.length === 0){
+        if(orders.length === 0){
              showStatusMessage('No orders found. Try adding one or syncing mock data.', 'info', 5000);
         }
     }, (error) => {
@@ -420,6 +464,20 @@ async function saveOrder(orderData) {
     }
 }
 
+function getFilteredOrders() {
+    const searchTerm = searchOrderInput.value.toLowerCase();
+    const statusFilter = filterStatusSelect.value;
+
+    return orders.filter(order => {
+        const matchesSearch = searchTerm === '' ||
+            (order.id && order.id.toLowerCase().includes(searchTerm)) ||
+            (order.customerName && order.customerName.toLowerCase().includes(searchTerm)) ||
+            (order.customerPhone && order.customerPhone.includes(searchTerm));
+        const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+}
+
 async function deleteOrder(id) {
     if (!userId || !ordersCollectionRef) {
         showStatusMessage("Cannot delete order: User not authenticated or collection not ready.", "error");
@@ -457,77 +515,48 @@ async function updateOrderStatus(orderId, newStatus) {
     }
 }
 
-// --- Filter and Search Functions ---
-function getFilteredOrders() {
-    const searchTerm = searchOrderInput.value.toLowerCase();
-    const statusFilter = filterStatusSelect.value;
-
-    return allOrders.filter(order => {
-        const matchesSearch = searchTerm === '' ||
-            (order.id && order.id.toLowerCase().includes(searchTerm)) || // Check if order.id exists
-            (order.customerName && order.customerName.toLowerCase().includes(searchTerm)) || // Check if customerName exists
-            (order.customerPhone && order.customerPhone.includes(searchTerm)); // Check if customerPhone exists
-        const matchesStatus = statusFilter === 'all' || (order.status && order.status === statusFilter); // Check if order.status exists
-        return matchesSearch && matchesStatus;
-    });
-}
-
-function applyFilters() {
-    renderOrders(getFilteredOrders());
-}
-
-// --- Sync Mock Data ---
 async function syncMockDataToFirestore() {
     if (!userId || !ordersCollectionRef) {
-        showStatusMessage("Please sign in to sync mock data.", "info");
+        showStatusMessage("Cannot sync mock data: User not authenticated or collection not ready.", "error");
         return;
     }
-    if (loaderContainer) loaderContainer.classList.remove('hidden');
-    try {
-        const batch = writeBatch(db);
-        // Delete existing data first (optional, but good for clean sync)
-        const existingDocs = await getDocs(ordersCollectionRef);
-        existingDocs.forEach(docSnap => {
-            batch.delete(doc(ordersCollectionRef, docSnap.id));
-        });
-        await batch.commit(); // Commit deletions
-
-        // Add mock data
-        const addBatch = writeBatch(db);
-        for (const data of mockOrders) {
-            const newOrderId = 'ORD' + String(Date.now()).slice(-7) + Math.floor(Math.random() * 100); // Ensure unique ID
-            const orderRef = doc(ordersCollectionRef, newOrderId);
-            addBatch.set(orderRef, {
-                ...data,
-                id: newOrderId,
-                createdAt: serverTimestamp(),
-                orderDate: data.orderDate // Keep original Date object for mock data
+    showConfirmModal("Sync Mock Data", "This will add mock data to your Firestore. Existing data will not be overwritten. Continue?", async () => {
+        if (loaderContainer) loaderContainer.classList.remove('hidden');
+        try {
+            const batch = writeBatch(db);
+            mockOrders.forEach(order => {
+                // Create a new document reference with an auto-generated ID
+                const newDocRef = doc(ordersCollectionRef, 'ORD' + String(Date.now() + Math.floor(Math.random() * 1000)).slice(-7)); // Unique ID based on timestamp + random
+                batch.set(newDocRef, {
+                    ...order,
+                    id: newDocRef.id, // Store the Firestore generated ID in the document
+                    orderDate: order.orderDate || serverTimestamp(), // Use provided date or server timestamp
+                    createdAt: serverTimestamp()
+                });
             });
-            // Small delay to ensure unique timestamp for subsequent mock orders if added quickly
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await batch.commit();
+            showStatusMessage("Mock data synced successfully!", "success");
+        } catch (e) {
+            console.error("Error syncing mock data:", e);
+            showStatusMessage("Error syncing mock data. Please try again.", "error");
+        } finally {
+            if (loaderContainer) loaderContainer.classList.add('hidden');
         }
-        await addBatch.commit(); // Commit additions
-        showStatusMessage("Mock data synced successfully!", "success");
-    } catch (e) {
-        console.error("Error syncing mock data: ", e);
-        showStatusMessage("Error syncing mock data. Please try again.", "error");
-    } finally {
-        if (loaderContainer) loaderContainer.classList.add('hidden');
-    }
+    });
 }
 
 
 // --- Render Functions ---
 
-function renderOrders(ordersToRender) { // Renamed parameter to avoid confusion with global allOrders
+function renderOrders(filteredOrders) {
     if (!ordersTableBody) return;
     ordersTableBody.innerHTML = '';
-    if (ordersToRender.length === 0) {
-        ordersTableBody.innerHTML = '<tr><td colspan="8" class="text-center p-10 text-gray-500">No orders found.</td></tr>';
+    if (filteredOrders.length === 0) {
+        ordersTableBody.innerHTML = '<tr><td colspan="8" class="text-center p-10 text-gray-500">No orders found matching your criteria.</td></tr>';
         return;
     }
 
-    ordersToRender.forEach(order => {
+    filteredOrders.forEach(order => {
         const row = ordersTableBody.insertRow();
         row.className = 'hover:bg-gray-50';
 
@@ -535,6 +564,7 @@ function renderOrders(ordersToRender) { // Renamed parameter to avoid confusion 
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.id || 'N/A'}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                 <div>${order.customerName || 'N/A'}</div>
+                <div class="text-xs text-gray-500 truncate max-w-xs" title="${order.deliveryAddress || ''}">${order.customerPhone || 'N/A'}</div>
                 <div class="text-xs text-gray-500 truncate max-w-xs" title="${order.deliveryAddress || ''}">${order.deliveryAddress || 'N/A'}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${order.product || 'N/A'}</td>
@@ -560,21 +590,22 @@ function renderOrders(ordersToRender) { // Renamed parameter to avoid confusion 
     attachActionListeners(); // Re-attach listeners to new elements
 }
 
-function renderMonthlyDues(orders) {
+function renderMonthlyDues() { // Removed 'orders' parameter as it will use the global 'orders' array
     if (!monthlyDuesTableBody || !monthlyDuesLoader) return;
     monthlyDuesLoader.classList.remove('hidden');
     monthlyDuesTableBody.innerHTML = '';
 
     const monthlyDues = {};
 
-    orders.forEach(order => {
+    orders.forEach(order => { // Use the global 'orders' array
         if (order.status === 'Cancelled' || !order.orderDate || typeof order.amount !== 'number') return;
         const monthYear = order.orderDate.toISOString().substring(0, 7); //YYYY-MM
-        const key = `${order.customerName || 'Unknown'}_${monthYear}`; // Use customer name for key
+        const key = `${order.customerName || 'Unknown'}_${order.customerPhone || 'Unknown'}_${monthYear}`; // Use customer name and phone for key
 
         if (!monthlyDues[key]) {
             monthlyDues[key] = {
                 customerName: order.customerName || 'Unknown',
+                customerPhone: order.customerPhone || 'N/A',
                 month: monthYear,
                 totalDue: 0,
                 ordersInBill: []
@@ -598,12 +629,19 @@ function renderMonthlyDues(orders) {
     monthlyDuesData.forEach(due => {
       const row = monthlyDuesTableBody.insertRow();
       row.innerHTML = `
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${due.customerName}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${due.month}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${due.customerName || 'N/A'}<br><span class="text-xs text-gray-500">${due.customerPhone || 'N/A'}</span></td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${new Date(due.month + '-01').toLocaleString('en-US', { month: 'long', year: 'numeric' })}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">₹${due.totalDue.toFixed(2)}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-          <button class="text-green-600 hover:text-green-900 download-monthly-bill-btn" data-customer="${due.customerName}" data-month="${due.month}" title="Download Monthly Bill">Download Bill</button>
-          ${due.totalDue > 0 ? `<button class="text-blue-600 hover:text-blue-900 ml-2 clear-dues-btn" data-customer="${due.customerName}" data-month="${due.month}" title="Mark Dues as Cleared (Simulated)">Clear Dues</button>` : ''}
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center space-x-2">
+          <button class="py-1 px-2 rounded-lg hover:shadow-md transition duration-150 ease-in-out flex items-center justify-center download-pdf-btn"
+                  data-customer-name="${due.customerName}" data-customer-phone="${due.customerPhone}" data-month="${due.month}" title="Download PDF Bill">
+              <img src="pdf.png" onerror="this.onerror=null;this.src='https://placehold.co/20x20/000000/FFFFFF?text=PDF';" alt="PDF Icon" class="w-10 h-10">
+          </button>
+          <button class="py-1 px-2 rounded-lg hover:shadow-md transition duration-150 ease-in-out flex items-center justify-center share-whatsapp-btn"
+                  data-customer-name="${due.customerName}" data-customer-phone="${due.customerPhone}" data-month="${due.month}" title="Share via WhatsApp">
+              <img src="whatsapp.png" onerror="this.onerror=null;this.src='https://placehold.co/20x20/000000/FFFFFF?text=WA';" alt="WhatsApp Icon" class="w-10 h-10">
+          </button>
+          ${due.totalDue > 0 ? `<button class="text-green-600 hover:text-green-900 ml-2 clear-dues-btn" data-customer-name="${due.customerName}" data-month="${due.month}" title="Mark Dues as Cleared">Clear Dues</button>` : ''}
         </td>
       `;
     });
@@ -646,161 +684,81 @@ async function markCustomerDuesAsPaid(customerName, monthKey) {
     }
 }
 
-function handleDownloadMonthlyBill(event) {
-  const customer = event.target.dataset.customer;
-  const month = event.target.dataset.month;
-  // Re-calculate dues to get the ordersInBill for the specific customer and month
-  // We need to fetch the current orders to generate the bill accurately.
-  // This is a simplified approach. In a real app, you might pass the full order object
-  // or re-query Firestore for the specific orders.
-   // const orderId = event.target.dataset.id; // This line is not needed here
-   // const order = orders.find(o => o.id === orderId); // This line is not needed here
-   // if (!order) { // This block is not needed here
-   //     showStatusMessage(`Order ${orderId} not found.`, 'error');
-   //     return;
-   // }
-  if (!ordersCollectionRef) {
-      showStatusMessage("Cannot download bill: User not authenticated or collection not ready.", "error");
-      return;
-  }
-  if (loaderContainer) loaderContainer.classList.remove('hidden');
+function generateBillContent(customerName, customerPhone, month) {
+    const ordersForBill = orders.filter(order => {
+        if (!order.orderDate || order.status === 'Cancelled') return false;
+        const orderMonthYear = order.orderDate.toISOString().substring(0, 7);
+        return order.customerName === customerName && order.customerPhone === customerPhone && orderMonthYear === month;
+    });
 
-  const startOfMonth = new Date(month + '-01T00:00:00Z');
-  const endOfMonth = new Date(startOfMonth);
-  endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+    let totalOutstanding = 0;
+    ordersForBill.forEach(order => {
+        if (!order.isPaid) {
+            totalOutstanding += order.amount || 0;
+        }
+    });
 
-  const q = query(ordersCollectionRef,
-      where('customerName', '==', customer),
-      where('orderDate', '>=', startOfMonth),
-      where('orderDate', '<', endOfMonth)
-  );
-
-  getDocs(q).then(querySnapshot => {
-      const ordersForBill = [];
-      let totalOutstanding = 0;
-      querySnapshot.forEach(docSnap => {
-          const order = {
-              id: docSnap.id,
-              ...docSnap.data(),
-              orderDate: docSnap.data().orderDate && docSnap.data().orderDate.toDate ? docSnap.data().orderDate.toDate() : (docSnap.data().orderDate ? new Date(docSnap.data().orderDate) : null)
-          };
-          ordersForBill.push(order);
-          if (!order.isPaid) {
-              totalOutstanding += order.amount || 0;
-          }
-      });
-
-      if (ordersForBill.length === 0) {
-        showStatusMessage(`No orders found for ${customer} for month ${month}.`, 'error');
-        if (loaderContainer) loaderContainer.classList.add('hidden');
-        return;
-      }
-
-      let billContent = `
+    let billContent = `
         MONTHLY WATER DELIVERY BILL
         ---------------------------------
-        Customer Name: ${customer}
+        Customer Name: ${customerName}
+        Customer Phone: ${customerPhone}
         Month: ${new Date(month).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
         ---------------------------------
         ORDERS:
-      `;
-      ordersForBill.forEach(order => {
+    `;
+    ordersForBill.forEach(order => {
         const amountDisplay = typeof order.amount === 'number' ? order.amount.toFixed(2) : 'N/A';
         billContent += `
         Order ID: ${order.id || 'N/A'} | Date: ${order.orderDate ? order.orderDate.toLocaleDateString() : 'N/A'} | Product: ${order.product} | Qty: ${order.quantity} | Amount: ₹${amountDisplay} | Status: ${order.status} | Paid: ${order.isPaid ? 'Yes' : 'No'}
         `;
-      });
-      billContent += `
+    });
+    billContent += `
         ---------------------------------
         TOTAL OUTSTANDING DUE: ₹${totalOutstanding.toFixed(2)}
         ---------------------------------
         Thank you!
-      `;
-      const blob = new Blob([billContent.replace(/^\s+/gm, '')], { type: 'text/plain;charset=utf-8' }); // Remove leading spaces per line
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `MonthlyBill-${customer.replace(/\s+/g, '_')}-${month}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
-      showStatusMessage(`Monthly bill for ${customer} (${month}) downloaded.`, 'success');
-  }).catch(error => {
-      console.error("Error generating monthly bill:", error);
-      showStatusMessage("Error generating monthly bill. Please try again.", "error");
-  }).finally(() => {
-      if (loaderContainer) loaderContainer.classList.add('hidden');
-  });
+    `;
+    return billContent.replace(/^\s+/gm, ''); // Remove leading spaces per line
+}
+
+function handleDownloadPdf(customerName, customerPhone, month) {
+    console.log(`Attempting to download PDF for ${customerName} (${month})`); // Debugging log
+    const billContent = generateBillContent(customerName, customerPhone, month);
+    const blob = new Blob([billContent], { type: 'text/plain;charset=utf-8' }); // For now, creating a text file as PDF generation is complex client-side
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `MonthlyBill-${customerName.replace(/\s+/g, '_')}-${month}.txt`; // Changed to .txt
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+    showStatusMessage(`Monthly bill for ${customerName} (${month}) downloaded as TXT. (PDF generation requires a server-side solution or more complex client-side library)`, 'success', 8000);
+}
+
+function handleShareWhatsapp(customerName, customerPhone, month) {
+    console.log(`Attempting to share via WhatsApp for ${customerName} (${month})`); // Debugging log
+    const billContent = generateBillContent(customerName, customerPhone, month);
+    const whatsappText = encodeURIComponent(`*Water Delivery Monthly Bill*\n\n${billContent}\n\n*Please note: This is a summary. For detailed breakdown, refer to your records.*`);
+    const whatsappUrl = `https://wa.me/${customerPhone}?text=${whatsappText}`;
+    window.open(whatsappUrl, '_blank');
+    showStatusMessage(`Attempting to share bill with ${customerName} on WhatsApp.`, 'info');
 }
 
 
 function editOrder(order) {
     currentOrderId = order.id;
     if (customerNameInput) customerNameInput.value = order.customerName;
-    if (customerPhoneInput) customerPhoneInput.value = order.customerPhone || ''; // Set phone
+    if (customerPhoneInput) customerPhoneInput.value = order.customerPhone; // Set phone number
     if (deliveryAddressInput) deliveryAddressInput.value = order.deliveryAddress;
-    if (productTypeSelectModal) productTypeSelectModal.value = order.product; // Use productTypeSelectModal
-    if (quantityInputModal) quantityInputModal.value = order.quantity; // Use quantityInputModal
+    if (productTypeSelectModal) productTypeSelectModal.value = order.product;
+    if (quantityInputModal) quantityInputModal.value = order.quantity;
     if (statusInput) statusInput.value = order.status;
-    if (orderDateInput) orderDateInput.value = order.orderDate ? order.orderDate.toISOString().split('T')[0] : '';
-    if (isPaidCheckbox) isPaidCheckbox.checked = order.isPaid;
-    calculateAndUpdateAmountModal(); // Calculate amount for editing
+    // orderDateInput and isPaidCheckbox are not in the HTML, so skip setting them
+    // if (orderDateInput) orderDateInput.value = order.orderDate ? order.orderDate.toISOString().split('T')[0] : '';
+    // if (isPaidCheckbox) isPaidCheckbox.checked = order.isPaid;
+    calculatedAmountInputModal.value = typeof order.amount === 'number' ? order.amount.toFixed(2) : '0.00'; // Set calculated amount for editing
     showModal('Edit Order', true);
-}
-
-// --- Dynamic Event Listeners for table actions ---
-function attachActionListeners() {
-    // Edit buttons
-    document.querySelectorAll('.edit-btn').forEach(button => {
-        button.onclick = (event) => {
-            const orderId = event.target.dataset.id;
-            const order = allOrders.find(o => o.id === orderId); // Find from global allOrders
-            if (order) {
-                editOrder(order);
-            } else {
-                showStatusMessage(`Order ${orderId} not found for editing.`, 'error');
-            }
-        };
-    });
-
-    // Status changers
-    document.querySelectorAll('.status-changer').forEach(select => {
-        select.onchange = (event) => {
-            const orderId = event.target.dataset.id;
-            const newStatus = event.target.value;
-            showConfirmModal('Change Order Status', `Are you sure you want to change status of Order ${orderId} to "${newStatus}"?`, () => {
-                updateOrderStatus(orderId, newStatus);
-            });
-        };
-    });
-
-    // Delete buttons
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.onclick = (event) => {
-            const orderId = event.target.dataset.id;
-            showConfirmModal('Delete Order', `Are you sure you want to delete Order ${orderId}? This action cannot be undone.`, () => {
-                deleteOrder(orderId);
-            });
-        };
-    });
-}
-
-function attachMonthlyDuesActionListeners() {
-    // Download Monthly Bill buttons
-    document.querySelectorAll('.download-monthly-bill-btn').forEach(button => {
-        button.onclick = handleDownloadMonthlyBill;
-    });
-
-    // Clear Dues buttons
-    document.querySelectorAll('.clear-dues-btn').forEach(button => {
-        button.onclick = (event) => {
-            const customer = event.target.dataset.customer;
-            const month = event.target.dataset.month;
-            showConfirmModal('Clear Dues', `Are you sure you want to mark all outstanding dues for ${customer} in ${new Date(month).toLocaleString('en-US', { month: 'long', year: 'numeric' })} as paid?`, () => {
-                markCustomerDuesAsPaid(customer, month);
-            });
-        };
-    });
 }
 
 
@@ -817,22 +775,22 @@ function attachEventListeners() {
     });
     if (closeModalBtn) closeModalBtn.addEventListener('click', hideModal);
 
-    if (orderForm) orderForm.addEventListener('submit', async (e) => { // Made async to await saveOrder
+    if (orderForm) orderForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const orderData = {
             customerName: customerNameInput.value.trim(),
-            customerPhone: customerPhoneInput.value.trim(), // Added customerPhone
+            customerPhone: customerPhoneInput.value.trim(), // Get phone number
             deliveryAddress: deliveryAddressInput.value.trim(),
             product: productTypeSelectModal.value,
             quantity: parseInt(quantityInputModal.value),
             amount: parseFloat(calculatedAmountInputModal.value),
             status: statusInput.value,
-            orderDate: new Date(orderDateInput ? orderDateInput.value : new Date().toISOString().split('T')[0]), // Use orderDateInput if available, else current date
-            isPaid: isPaidCheckbox ? isPaidCheckbox.checked : false // Use isPaidCheckbox if available
+            orderDate: new Date(), // Always use current date for new/updated orders
+            isPaid: false // New orders are initially unpaid
         };
 
         // Basic validation
-        const requiredFields = ['customerName', 'customerPhone', 'deliveryAddress', 'product']; // Added customerPhone
+        const requiredFields = ['customerName', 'customerPhone', 'deliveryAddress', 'product'];
         let missingFieldsMessages = [];
         requiredFields.forEach(field => {
             if (!orderData[field]) missingFieldsMessages.push(field.replace(/([A-Z])/g, ' $1').toLowerCase());
@@ -845,7 +803,7 @@ function attachEventListeners() {
             return;
         }
 
-        await saveOrder(orderData); // Await the save operation
+        saveOrder(orderData);
     });
 
     if (confirmModalCancelBtn) confirmModalCancelBtn.addEventListener('click', hideConfirmModal);
@@ -877,8 +835,7 @@ function attachEventListeners() {
       if (monthlyDuesSection) monthlyDuesSection.classList.add('hidden-section');
       if (showOrdersTab) showOrdersTab.classList.add('active');
       if (showMonthlyDuesTab) showMonthlyDuesTab.classList.remove('active');
-      // Re-render orders with current filters when switching back to this tab
-      renderOrders(getFilteredOrders());
+      renderOrders(getFilteredOrders()); // Re-render filtered orders
     });
 
     if (showMonthlyDuesTab) showMonthlyDuesTab.addEventListener('click', () => {
@@ -886,27 +843,104 @@ function attachEventListeners() {
       if (monthlyDuesSection) monthlyDuesSection.classList.remove('hidden-section');
       if (showOrdersTab) showOrdersTab.classList.remove('active');
       if (showMonthlyDuesTab) showMonthlyDuesTab.classList.add('active');
-      // Trigger re-render of monthly dues when tab is switched
-      // Monthly dues always render based on allOrders, which is updated by onSnapshot
-      renderMonthlyDues(allOrders);
+      renderMonthlyDues(); // Trigger re-render of monthly dues
     });
 
-    // --- Filter and Search Event Listeners ---
-    if (applyFiltersBtn) {
-        applyFiltersBtn.addEventListener('click', applyFilters);
-    }
-    // Optional: Apply filters on input change for live search/filter
-    if (searchOrderInput) {
-        searchOrderInput.addEventListener('input', applyFilters);
-    }
-    if (filterStatusSelect) {
-        filterStatusSelect.addEventListener('change', applyFilters);
-    }
+    // --- Filter Event Listeners ---
+    if (applyFiltersBtn) applyFiltersBtn.addEventListener('click', () => {
+        renderOrders(getFilteredOrders());
+    });
+    if (searchOrderInput) searchOrderInput.addEventListener('input', () => {
+        renderOrders(getFilteredOrders()); // Apply filter on input change
+    });
+    if (filterStatusSelect) filterStatusSelect.addEventListener('change', () => {
+        renderOrders(getFilteredOrders()); // Apply filter on status change
+    });
+}
+
+
+// Dynamic listeners for edit, delete, status change
+function attachActionListeners() {
+    // Edit button listeners
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.onclick = (e) => {
+            const orderId = e.target.dataset.id;
+            const orderToEdit = orders.find(order => order.id === orderId);
+            if (orderToEdit) {
+                editOrder(orderToEdit);
+            } else {
+                showStatusMessage('Order not found!', 'error');
+            }
+        };
+    });
+
+    // Delete button listeners
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.onclick = (e) => {
+            const orderId = e.target.dataset.id;
+            showConfirmModal("Delete Order", `Are you sure you want to delete order ${orderId}? This action cannot be undone.`, () => {
+                deleteOrder(orderId);
+            });
+        };
+    });
+
+    // Status changer listeners
+    document.querySelectorAll('.status-changer').forEach(select => {
+        select.onchange = (e) => {
+            const orderId = e.target.dataset.id;
+            const newStatus = e.target.value;
+            updateOrderStatus(orderId, newStatus);
+        };
+    });
+}
+
+// Dynamic listeners for monthly dues actions
+function attachMonthlyDuesActionListeners() {
+    console.log("attachMonthlyDuesActionListeners called."); // Debugging log
+
+    // Download PDF button listeners
+    const downloadPdfButtons = document.querySelectorAll('.download-pdf-btn');
+    console.log(`Found ${downloadPdfButtons.length} 'Download PDF' buttons.`); // Debugging log
+    downloadPdfButtons.forEach(button => {
+        button.onclick = (e) => {
+            console.log("Download PDF button clicked!"); // Debugging log
+            const customerName = e.currentTarget.dataset.customerName; // Use currentTarget to get data from the button itself
+            const customerPhone = e.currentTarget.dataset.customerPhone;
+            const month = e.currentTarget.dataset.month;
+            handleDownloadPdf(customerName, customerPhone, month);
+        };
+    });
+
+    // Share WhatsApp button listeners
+    const shareWhatsappButtons = document.querySelectorAll('.share-whatsapp-btn');
+    console.log(`Found ${shareWhatsappButtons.length} 'Share WhatsApp' buttons.`); // Debugging log
+    shareWhatsappButtons.forEach(button => {
+        button.onclick = (e) => {
+            console.log("Share WhatsApp button clicked!"); // Debugging log
+            const customerName = e.currentTarget.dataset.customerName; // Use currentTarget
+            const customerPhone = e.currentTarget.dataset.customerPhone;
+            const month = e.currentTarget.dataset.month;
+            handleShareWhatsapp(customerName, customerPhone, month);
+        };
+    });
+
+    // Clear Dues button listeners (existing logic)
+    document.querySelectorAll('.clear-dues-btn').forEach(button => {
+        button.onclick = (e) => {
+            const customerName = e.target.dataset.customerName;
+            const month = e.target.dataset.month;
+            showConfirmModal("Clear Monthly Dues", `Are you sure you want to mark all outstanding dues for ${customerName} in ${new Date(month).toLocaleString('en-US', { month: 'long', year: 'numeric' })} as paid?`, () => {
+                markCustomerDuesAsPaid(customerName, month);
+            });
+        };
+    });
 }
 
 
 // --- Initial Load ---
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOMContentLoaded event fired."); // Debugging log
+
     // Initialize all DOM element references here
     loaderContainer = document.getElementById('loaderContainer');
     statusMessage = document.getElementById('statusMessage');
@@ -917,14 +951,11 @@ document.addEventListener('DOMContentLoaded', () => {
     orderForm = document.getElementById('orderForm');
     modalTitle = document.getElementById('modalTitle');
     saveOrderBtn = document.getElementById('saveOrderBtn');
-    deleteOrderBtn = document.getElementById('deleteOrderBtn');
     customerNameInput = document.getElementById('customerName');
-    customerPhoneInput = document.getElementById('customerPhone'); // Initialize customerPhoneInput
+    customerPhoneInput = document.getElementById('customerPhone');
     deliveryAddressInput = document.getElementById('customerAddress');
     quantityInputModal = document.getElementById('quantity');
     statusInput = document.getElementById('orderStatusModal');
-    orderDateInput = document.getElementById('orderDate');
-    isPaidCheckbox = document.getElementById('isPaid');
     customConfirmModal = document.getElementById('customConfirmModal');
     confirmModalTitle = document.getElementById('confirmModalTitle');
     confirmModalMessage = document.getElementById('confirmModalMessage');
@@ -949,9 +980,9 @@ document.addEventListener('DOMContentLoaded', () => {
     userIdDisplay = document.getElementById('userIdDisplay');
     productTypeSelectModal = document.getElementById('productType');
     calculatedAmountInputModal = document.getElementById('calculatedAmount');
-    searchOrderInput = document.getElementById('searchOrder'); // Initialize searchOrderInput
-    filterStatusSelect = document.getElementById('filterStatus'); // Initialize filterStatusSelect
-    applyFiltersBtn = document.getElementById('applyFiltersBtn'); // Initialize applyFiltersBtn
+    searchOrderInput = document.getElementById('searchOrder');
+    filterStatusSelect = document.getElementById('filterStatus');
+    applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
     // Initialize new Email/Password Auth elements
     emailInput = document.getElementById('emailInput');
@@ -959,6 +990,15 @@ document.addEventListener('DOMContentLoaded', () => {
     emailLoginBtn = document.getElementById('emailLoginBtn');
     emailSignupBtn = document.getElementById('emailSignupBtn');
 
+    // --- Explicitly hide all modals on load to prevent lingering 'open' states ---
+    if (orderModal) {
+        orderModal.classList.remove('open');
+        console.log("orderModal explicitly hidden on load.");
+    }
+    if (customConfirmModal) {
+        customConfirmModal.classList.remove('open');
+        console.log("customConfirmModal explicitly hidden on load.");
+    }
 
     // Attach all event listeners after DOM is ready
     attachEventListeners();

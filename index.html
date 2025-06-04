@@ -11,15 +11,15 @@
 <body class="p-4 md:p-8 bg-gray-100">
 
     <div class="max-w-7xl mx-auto">
-        <header class="mb-8 p-4 bg-white shadow-lg rounded-lg">
+        <header class="mb-8 p-6 bg-white shadow-lg rounded-lg">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <h1 class="text-3xl font-bold text-blue-600">Water Ordering Admin (Firestore)</h1>
-                <div class="mt-4 md:mt-0 space-x-2">
-                    <button id="addOrderBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold mt-1 mx-px py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
+                <div class="mt-4 md:mt-0 space-x-2 flex flex-wrap justify-center md:justify-end">
+                    <button id="addOrderBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out mt-1 mx-px">
                         Add New Order
                     </button>
-                   <button id="syncMockDataBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold mt-1 mx-px py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
-                        Sync Data
+                   <button id="syncMockDataBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out mt-1 mx-px">
+                            Sync Mock Data
                     </button>
                 </div>
             </div>
@@ -28,124 +28,127 @@
             <div class="mt-3 text-xs text-gray-400 text-center">
                 App ID: <span id="appIdDisplay">loading...</span> | User ID: <span id="userIdDisplay">loading...</span>
             </div>
+        </header>
 
-            <div id="authSection" class="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50 text-center">
-                <p class="text-gray-700 font-semibold mb-2">Authentication Status: <span id="authStatus" class="text-red-500">Not Authenticated</span></p>
-                <p class="text-gray-600 text-sm">User: <span id="userName">N/A</span> (<span id="userEmail">N/A</span>)</p>
-                <div class="mt-4 flex flex-col items-center space-y-4">
-                    <button id="googleSignInBtn" class="w-full max-w-xs bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out flex items-center justify-center">
-                        <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M12.24 10.27c-.23-.74-.79-1.28-1.57-1.28-.97 0-1.76.63-1.76 1.54 0 .97.83 1.54 1.76 1.54.79 0 1.34-.47 1.57-1.28z"/><path d="M22.67 11.02V12h-1.04c-.11 1.74-.95 3.27-2.38 4.39l.75.75c1.55-1.23 2.59-3.1 2.76-5.26h-.09zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M11.99 4c-3.31 0-6 2.69-6 6s2.69 6 6 6c1.17 0 2.22-.34 3.12-.92l-.75-.75c-.75.49-1.63.76-2.37.76-2.5 0-4.54-2.04-4.54-4.54S9.5 5.46 12 5.46c1.47 0 2.75.69 3.59 1.77l.75-.75C15.52 5.4 13.88 4 11.99 4z"/><path d="M16.5 12c0-2.5-2.04-4.54-4.54-4.54S7.46 9.5 7.46 12s2.04 4.54 4.54 4.54 4.54-2.04 4.54-4.54z"/></svg>
-                        Sign In with Google
+        <!-- Authentication Section -->
+        <section id="authSection" class="bg-white shadow-xl rounded-lg p-8 mb-8 text-center hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Sign In / Sign Up</h2>
+            <div class="space-y-4 max-w-md mx-auto">
+                <div>
+                    <input type="email" id="emailInput" placeholder="Email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <input type="password" id="passwordInput" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <button id="emailLoginBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
+                        Login with Email
                     </button>
-
-                    <div class="w-full max-w-xs flex items-center my-4">
-                        <div class="flex-grow border-t border-gray-300"></div>
-                        <span class="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
-                        <div class="flex-grow border-t border-gray-300"></div>
-                    </div>
-
-                    <div class="w-full max-w-xs space-y-3">
-                        <div>
-                            <label for="emailInput" class="sr-only">Email</label>
-                            <input type="email" id="emailInput" placeholder="Email" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label for="passwordInput" class="sr-only">Password</label>
-                            <input type="password" id="passwordInput" placeholder="Password" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <button id="emailLoginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
-                            Login with Email
-                        </button>
-                        <button id="emailSignupBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
-                            Sign Up with Email
-                        </button>
-                    </div>
-
-                    <button id="signOutButton" class="w-full max-w-xs bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out mt-4">
-                        Sign Out
+                    <button id="emailSignupBtn" class="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
+                        Sign Up with Email
                     </button>
                 </div>
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-gray-300"></div>
+                    <span class="flex-shrink mx-4 text-gray-500">OR</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+                <button id="googleSignInBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.0003 4.75C14.0273 4.75 15.8003 5.45 17.1873 6.7125L20.0478 3.852C17.9453 1.7775 15.1978 0.75 12.0003 0.75C7.2723 0.75 3.1998 3.4875 1.2928 7.3125L5.2503 10.365C6.1128 7.695 8.8653 5.75 12.0003 5.75C12.0003 5.75 12.0003 4.75 12.0003 4.75Z" fill="#EA4335"></path><path d="M23.2503 12.0003C23.2503 11.3433 23.1978 10.6953 23.0978 10.0653H12.0003V14.3253H18.4803C18.2178 15.6753 17.4153 16.8453 16.2078 17.6553L20.1653 20.7303C22.2228 18.7953 23.2503 15.7278 23.2503 12.0003Z" fill="#4285F4"></path><path d="M12.0003 23.25C15.2478 23.25 17.9928 22.125 20.1653 20.7303L16.2078 17.6553C15.1128 18.3753 13.6878 18.8253 12.0003 18.8253C8.8653 18.8253 6.1128 16.8828 5.2503 14.2128L1.2928 17.2653C3.1998 21.0903 7.2723 23.7528 12.0003 23.7528C12.0003 23.7528 12.0003 23.25 12.0003 23.25Z" fill="#34A853"></path><path d="M4.75025 14.0625C4.50025 13.395 4.36525 12.705 4.36525 12.0003C4.36525 11.2953 4.50025 10.6053 4.75025 9.9378L4.74775 9.9353L0.685254 6.7878C-0.492246 9.1728 -0.127246 12.0003 1.29275 14.6553L4.75025 14.0625Z" fill="#FBBC04"></path>
+                    </svg>
+                    Sign In with Google
+                </button>
             </div>
-            </header>
+            <div class="mt-6 text-gray-700">
+                <p>Auth Status: <span id="authStatus" class="font-semibold">Not Authenticated</span></p>
+                <p>User Name: <span id="userName" class="font-semibold">N/A</span></p>
+                <p>User Email: <span id="userEmail" class="font-semibold">N/A</span></p>
+            </div>
+        </section>
 
-        <main id="adminContent" class="hidden"> <div class="mb-6 mt-4">
-                <button id="showOrdersTab" class="tab-button active mt-2 mx-px py-2 px-4 rounded-lg">Individual Orders</button>
-                <button id="showMonthlyDuesTab" class="tab-button mt-2 mx-px py-2 px-4 rounded-lg">Monthly Dues</button>
+        <div id="adminContent" class="hidden">
+            <div class="mb-6">
+                <button id="showOrdersTab" class="tab-button active">Individual Orders</button>
+                <button id="showMonthlyDuesTab" class="tab-button">Monthly Dues</button>
             </div>
 
-            <section id="individualOrdersSection">
-                <div class="mb-6 p-4 bg-white shadow rounded-lg">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="searchOrder" class="block text-sm font-medium text-gray-700">Search Order (ID, Name, Phone)</label>
-                            <input type="text" id="searchOrder" name="searchOrder" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g., John Doe or ORD001">
-                        </div>
-                        <div>
-                            <label for="filterStatus" class="block text-sm font-medium text-gray-700">Filter by Status</label>
-                            <select id="filterStatus" name="filterStatus" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <option value="all">All Statuses</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Confirmed">Confirmed</option>
-                                <option value="Delivering">Out for Delivery</option>
-                                <option value="Delivered">Delivered</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                        <div class="flex items-end">
-                            <button id="applyFiltersBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out w-full md:w-auto">Apply Filters</button>
+            <main>
+                <section id="individualOrdersSection">
+                    <div class="mb-6 p-4 bg-white shadow rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="searchOrder" class="block text-sm font-medium text-gray-700">Search Order (ID, Name, Phone)</label>
+                                <input type="text" id="searchOrder" name="searchOrder" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g., John Doe or ORD001">
+                            </div>
+                            <div>
+                                <label for="filterStatus" class="block text-sm font-medium text-gray-700">Filter by Status</label>
+                                <select id="filterStatus" name="filterStatus" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <option value="all">All Statuses</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Confirmed">Confirmed</option>
+                                    <option value="Delivering">Out for Delivery</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button id="applyFiltersBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out w-full md:w-auto">Apply Filters</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="bg-white shadow-xl rounded-lg overflow-x-auto">
-                    <div id="loaderContainer" class="hidden p-10 text-center"><div class="loader"></div><p class="text-gray-600">Loading orders...</p></div>
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (INR)</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ordersTableBody" class="bg-white divide-y divide-gray-200">
-                             <tr><td colspan="8" class="text-center p-10 text-gray-500">No orders found. Ensure Firebase is connected and data exists, or try syncing mock data.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                    <div class="bg-white shadow-xl rounded-lg overflow-x-auto">
+                        <div id="loaderContainer" class="hidden p-10 text-center"><div class="loader"></div><p class="text-gray-600">Loading orders...</p></div>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (INR)</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody" class="bg-white divide-y divide-gray-200">
+                                 <tr><td colspan="8" class="text-center p-10 text-gray-500">No orders found. Ensure Firebase is connected and data exists, or try syncing mock data.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
 
-            <section id="monthlyDuesSection" class="hidden-section">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Monthly Customer Dues</h2>
-                <div class="bg-white shadow-xl rounded-lg overflow-x-auto">
-                    <div id="monthlyDuesLoader" class="hidden p-10 text-center"><div class="loader"></div><p class="text-gray-600">Calculating monthly dues...</p></div>
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Name</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Due (INR)</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="monthlyDuesTableBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="5" class="text-center p-10 text-gray-500">No monthly dues found or calculated yet.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            <p class="mt-4 text-xs text-gray-500 text-center">Note: Dues clearing is simulated. Persistent payment tracking requires further backend logic and potentially secure payment integration.</p>
-        </main>
+                <section id="monthlyDuesSection" class="hidden-section">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Monthly Customer Dues</h2>
+                    <div class="bg-white shadow-xl rounded-lg overflow-x-auto">
+                        <div id="monthlyDuesLoader" class="hidden p-10 text-center"><div class="loader"></div><p class="text-gray-600">Calculating monthly dues...</p></div>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Name</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Due (INR)</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthlyDuesTableBody" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="5" class="text-center p-10 text-gray-500">No monthly dues found or calculated yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <p class="mt-4 text-xs text-gray-500 text-center">Note: Dues clearing is simulated. Persistent payment tracking requires further backend logic and potentially secure payment integration.</p>
+            </main>
+        </div>
     </div>
 
-    <div id="orderModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-75  h-full w-full items-center justify-center z-50">
-        <div class="relative max-w-md max-h-screen h-full mx-auto p-8 border w-full max-w-md overflow-y-auto shadow-custom-lg rounded-xl bg-white mx-auto my-2.5 flex flex-col items-center">
-            <div class="mb-2">
-                <h3 class="text-2xl leading-tight font-bold text-gray-900 mb-6 text-center" id="modalTitle">Add New Order</h3>
+    <!-- Order Modal -->
+    <div id="orderModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-75 overflow-y-auto h-full w-full items-center justify-center z-50">
+        <div class="relative mx-auto p-6 border w-full max-w-lg shadow-lg rounded-xl bg-white">
+            <div class="mt-3">
+                <h3 class="text-2xl leading-6 font-bold text-gray-900 mb-6 text-center" id="modalTitle">Add New Order</h3>
                 <form id="orderForm" class="space-y-5">
                     <input type="hidden" id="orderIdInput" name="orderIdInput">
                     <div>
@@ -177,26 +180,15 @@
                         <label for="calculatedAmount" class="block text-sm font-medium text-gray-700 text-left">Calculated Amount (INR)</label>
                         <input type="text" name="calculatedAmount" id="calculatedAmount" readonly class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm sm:text-sm" placeholder="Autocalculated">
                     </div>
-
-            <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-5 sm:space-y-0">
-                <div class="flex flex-col w-full sm:w-1/2">
-                    <label for="orderStatusModal" class="block text-sm font-medium text-gray-700 text-left">Status</label>
-                    <select name="orderStatusModal" id="orderStatusModal" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        <option value="Pending">Pending</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="Delivering">Out for Delivery</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
-                <div class="flex flex-col w-full sm:w-1/2">
-                    <label for="orderDate" class="block text-sm font-medium text-gray-700 text-left">Order Date</label>
-                    <input type="date" name="orderDate" id="orderDate" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-            </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" name="isPaid" id="isPaid" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label for="isPaid" class="ml-2 block text-sm text-gray-900">Mark as Paid</label>
+                    <div>
+                        <label for="orderStatusModal" class="block text-sm font-medium text-gray-700 text-left">Status</label>
+                        <select name="orderStatusModal" id="orderStatusModal" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="Pending">Pending</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Delivering">Out for Delivery</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
                     </div>
                     <div class="items-center gap-4 pt-4">
                         <button id="saveOrderBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-150 ease-in-out">
@@ -211,6 +203,7 @@
         </div>
     </div>
 
+    <!-- Custom Confirm Modal -->
     <div id="customConfirmModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-75 overflow-y-auto h-full w-full items-center justify-center z-50">
         <div class="relative mx-auto p-6 border w-full max-w-md shadow-lg rounded-xl bg-white">
             <h3 class="text-xl font-semibold text-gray-900 mb-4" id="confirmModalTitle">Confirm Action</h3>
