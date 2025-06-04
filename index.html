@@ -11,15 +11,15 @@
 <body class="p-4 md:p-8 bg-gray-100">
 
     <div class="max-w-7xl mx-auto">
-        <header class="mb-8 p-6 bg-white shadow-lg rounded-lg">
+        <header class="mb-8 p-4 bg-white shadow-lg rounded-lg">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <h1 class="text-3xl font-bold text-blue-600">Water Ordering Admin (Firestore)</h1>
                 <div class="mt-4 md:mt-0 space-x-2">
-                    <button id="addOrderBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold m-2 py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
+                    <button id="addOrderBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold mt-1 mx-px py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
                         Add New Order
                     </button>
-                   <button id="syncMockDataBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold m-2 py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
-                            Sync Data
+                   <button id="syncMockDataBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold mt-1 mx-px py-2 px-4 rounded-lg shadow transition duration-150 ease-in-out">
+                        Sync Data
                     </button>
                 </div>
             </div>
@@ -68,9 +68,9 @@
             </div>
             </header>
 
-        <main id="adminContent" class="hidden"> <div class="mb-6">
-                <button id="showOrdersTab" class="tab-button active m-2 py-2 px-4 rounded-lg">Individual Orders</button>
-                <button id="showMonthlyDuesTab" class="tab-button m-2 py-2 px-4 rounded-lg">Monthly Dues</button>
+        <main id="adminContent" class="hidden"> <div class="mb-6 mt-4">
+                <button id="showOrdersTab" class="tab-button active mt-2 mx-px py-2 px-4 rounded-lg">Individual Orders</button>
+                <button id="showMonthlyDuesTab" class="tab-button mt-2 mx-px py-2 px-4 rounded-lg">Monthly Dues</button>
             </div>
 
             <section id="individualOrdersSection">
