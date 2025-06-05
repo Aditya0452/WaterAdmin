@@ -633,15 +633,15 @@ function renderMonthlyDues() { // Removed 'orders' parameter as it will use the 
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${new Date(due.month + '-01').toLocaleString('en-US', { month: 'long', year: 'numeric' })}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">₹${due.totalDue.toFixed(2)}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center space-x-2">
-          <button class="py-1 px-2 rounded-lg hover:shadow-md transition duration-150 ease-in-out flex items-center justify-center download-pdf-btn"
+          <button class="w-10 h-10 m-2 rounded-lg flex items-center justify-center download-pdf-btn hover:shadow-md transition duration-150 ease-in-out"
                   data-customer-name="${due.customerName}" data-customer-phone="${due.customerPhone}" data-month="${due.month}" title="Download PDF Bill">
-              <img src="pdf.png" onerror="this.onerror=null;this.src='https://placehold.co/20x20/000000/FFFFFF?text=PDF';" alt="PDF Icon" class="w-10 h-10">
+              <img src="pdf.png" onerror="this.onerror=null;this.src='pdf.png';" alt="PDF" class="w-10 h-10 whitespace-nowrap">
           </button>
-          <button class="py-1 px-2 rounded-lg hover:shadow-md transition duration-150 ease-in-out flex items-center justify-center share-whatsapp-btn"
+          <button class="w-10 h-10 m-2 rounded-lg flex items-center justify-center share-whatsapp-btn hover:shadow-md transition duration-150 ease-in-out"
                   data-customer-name="${due.customerName}" data-customer-phone="${due.customerPhone}" data-month="${due.month}" title="Share via WhatsApp">
-              <img src="whatsapp.png" onerror="this.onerror=null;this.src='https://placehold.co/20x20/000000/FFFFFF?text=WA';" alt="WhatsApp Icon" class="w-10 h-10">
+              <img src="whatsapp.png" onerror="this.onerror=null;this.src='whatsapp.png';" alt="WhatsApp" class="w-10 h-10 whitespace-nowrap">
           </button>
-          ${due.totalDue > 0 ? `<button class="text-green-600 hover:text-green-900 ml-2 clear-dues-btn" data-customer-name="${due.customerName}" data-month="${due.month}" title="Mark Dues as Cleared">Clear Dues</button>` : ''}
+          ${due.totalDue > 0 ? `<button class="text-green-600 hover:text-green-900 m-3 clear-dues-btn" data-customer-name="${due.customerName}" data-month="${due.month}" title="Mark Dues as Cleared">Clear Dues</button>` : ''}
         </td>
       `;
     });
