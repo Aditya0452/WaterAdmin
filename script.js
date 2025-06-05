@@ -97,7 +97,8 @@ let emailSignupBtn;
 
 // Product prices (INR) - ensure these match what's in the HTML select options if prices are displayed there
 const productPrices = {
-  "20L Tin": 50,
+  "20L Tin": 30,
+  "Cool Tin": 40,
   "1L Bottle (Case)": 120,
   "500ml Bottle (Case)": 180,
   "Tanker Supply": 2500
